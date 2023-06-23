@@ -36,7 +36,7 @@ class Actions:
 
     declaration_path = "/__space/actions"
 
-    def __init__(self, base_path: str = "/__space/actions"):
+    def __init__(self, base_path: str = declaration_path):
         self.base_path = base_path
         self.actions: MutableSequence[Action] = []
 
