@@ -11,7 +11,6 @@ This package is somewhat temporary, hopefully its functionality will be implemen
 - [ ] Finish writing it
   - [ ] Generic ASGI middleware
   - [ ] Invocation function
-- [ ] Make it installable
 - [ ] Write a README
 
 ## License
