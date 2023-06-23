@@ -1,4 +1,4 @@
-from typing import Any, Awaitable, Callable, MutableMapping, MutableSequence, Sequence
+from typing import Any, Awaitable, Callable, MutableMapping, Sequence
 
 from starlette.exceptions import HTTPException
 from starlette.requests import Request
@@ -39,12 +39,14 @@ class Actions:
 
     def __init__(self, base_path: str = declaration_path):
         self.base_path = base_path
-        self.actions: MutableSequence[Action] = []
+        self._actions: MutableMapping[str, Action] = {}
 
     def add(self, name: str, handler: ActionHandler, inputs: Sequence[Input] = MISSING, title: str = "") -> Action:
         """Add an action."""
+        if name in self._actions:
+            raise ValueError(f"action '{name}' already exists")
         action = Action(name, handler, self.base_path, inputs, title)
-        self.actions.append(action)
+        self._actions[action.name] = action
         return action
 
     def declaration(self):
@@ -57,7 +59,7 @@ class Actions:
                     "path": action.path,
                     "input": [input.to_dict() for input in action.inputs],
                 }
-                for action in self.actions
+                for action in self._actions.values()
             ],
         }
 
@@ -67,7 +69,7 @@ class Actions:
             return self.declaration()
         if request.method == "POST" and request.url.path.startswith(self.base_path):
             name = request.url.path.lstrip(self.base_path + "/").rstrip("/")
-            action = next((action for action in self.actions if action.name == name), None)
+            action = self._actions.get(name)
             if not action:
                 raise HTTPException(404, f"Action {name} not found")
             return await action.run(await request.json())
