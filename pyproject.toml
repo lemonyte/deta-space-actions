@@ -29,7 +29,7 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/lemonyte/deta-space-actions"
+Repository = "https://github.com/lemonyte/deta-space-actions"
 
 [tool.setuptools]
 packages = ["deta_space_actions"]
