@@ -1,3 +1,39 @@
 [build-system]
 requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "deta-space-actions"
+dynamic = ["version"]
+description = "Deta Space Actions SDK."
+readme = "README.md"
+license = {file = "LICENSE.txt"}
+requires-python = ">=3.8"
+authors = [
+    {name = "Lemonyte"},
+]
+keywords = [
+    "deta",
+    "sdk",
+    "middleware",
+    "http",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Topic :: Utilities",
+    "Typing :: Typed",
+]
+
+[project.urls]
+Homepage = "https://github.com/lemonyte/deta-space-actions"
+
+[tool.setuptools]
+packages = ["deta_space_actions"]
+package-data = {deta_space_actions = ["py.typed"]}
+
+[tool.setuptools.dynamic]
+version = {attr = "deta_space_actions.__version__"}
