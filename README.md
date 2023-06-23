@@ -13,10 +13,44 @@ This package is somewhat temporary, hopefully its functionality will be implemen
   - [ ] Invocation function
 - [ ] Write a README
 
+## Installation
+
+To install the latest in-development version:
+
+```shell
+pip install git+https://github.com/lemonyte/deta-space-actions
+```
+
+Or, to install a specific commit:
+
+```shell
+pip install git+https://github.com/lemonyte/deta-space-actions@{commit}
+```
+
 ## Usage
 
 ```python
-# TODO
+from deta_space_actions import Actions, Input, InputType
+
+
+async def hello(payload):
+    return f"Hello, {payload['name']}"
+
+
+actions = Actions()
+
+actions.add(
+    name="hello",
+    handler=hello,
+    inputs=[
+        Input(
+            name="name",
+            type=InputType.STRING,
+            optional=False,
+        ),
+    ],
+    title="Say hello",
+)
 ```
 
 ## License
