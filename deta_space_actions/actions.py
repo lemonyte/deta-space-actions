@@ -5,6 +5,7 @@ from starlette.requests import Request
 
 from .input import Input
 
+# TODO: MutableMapping is incompatible with Dict??
 HandlerInput = MutableMapping[str, Any]
 ActionHandler = Callable[[HandlerInput], Awaitable[Any]]
 MISSING = Any
