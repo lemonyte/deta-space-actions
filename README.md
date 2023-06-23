@@ -13,6 +13,12 @@ This package is somewhat temporary, hopefully its functionality will be implemen
   - [ ] Invocation function
 - [ ] Write a README
 
+## Usage
+
+```python
+# TODO
+```
+
 ## License
 
 [MIT License](LICENSE.txt)
