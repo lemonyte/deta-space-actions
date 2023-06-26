@@ -17,8 +17,8 @@ This package is somewhat temporary, hopefully its functionality will be implemen
 
 ## TODO
 
-- [ ] Finish writing it
-  - [ ] Invocation function
+- [ ] Invocation function
+- [ ] Better typing
 - [ ] Add tests
 
 ## Installation
@@ -56,19 +56,19 @@ The package provides a generic ASGI middleware class that can be used with any A
 ```python
 from deta_space_actions import Actions, ActionsMiddleware, Input, InputType
 
-
-# Define an action handler.
-async def hello(payload):
-    return f"Hello, {payload.get('name', 'world')}!"
-
-
+# Create an ASGI app.
+app = ...
 # Create an Actions instance.
 actions = Actions()
+# Add the middleware if your framework has a helper method for adding middleware.
+app.add_middleware(ActionsMiddleware, actions=actions)
+# Otherwise, wrap the app instance.
+app = ActionsMiddleware(app, actions=actions)
+
 
 # Add an action.
-actions.add(
-    name="hello",
-    handler=hello,
+@actions.action(
+    title="Say hello",
     inputs=[
         Input(
             name="name",
@@ -76,15 +76,9 @@ actions.add(
             optional=False,
         ),
     ],
-    title="Say hello",
 )
-
-# Create an ASGI app.
-app = ...
-# Add the middleware if your framework has a helper method for adding middleware.
-app.add_middleware(ActionsMiddleware, actions=actions)
-# Otherwise, wrap the app instance.
-app = ActionsMiddleware(app, actions=actions)
+async def hello(payload):
+    return f"Hello, {payload.get('name', 'world')}!"
 ```
 
 ### Using your own path handler
@@ -99,19 +93,15 @@ from fastapi import FastAPI, HTTPException, Request
 
 from deta_space_actions import Actions, Input, InputType
 
-
-# Define an action handler.
-async def hello(payload):
-    return f"Hello, {payload.get('name', 'world')}!"
-
-
+# Create a FastAPI app.
+app = FastAPI()
 # Create an Actions instance.
 actions = Actions()
 
+
 # Add an action.
-actions.add(
-    name="hello",
-    handler=hello,
+@actions.action(
+    title="Say hello",
     inputs=[
         Input(
             name="name",
@@ -119,11 +109,9 @@ actions.add(
             optional=False,
         ),
     ],
-    title="Say hello",
 )
-
-# Create a FastAPI app.
-app = FastAPI()
+async def hello(payload):
+    return f"Hello, {payload.get('name', 'world')}!"
 
 
 # Define a path handler.
