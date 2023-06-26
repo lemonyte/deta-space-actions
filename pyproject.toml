@@ -31,6 +31,9 @@ classifiers = [
 [project.urls]
 Repository = "https://github.com/lemonyte/deta-space-actions"
 
+[project.optional-dependencies]
+typing = ["asgiref~=3.7.2"]
+
 [tool.setuptools]
 packages = ["deta_space_actions"]
 package-data = {deta_space_actions = ["py.typed"]}
