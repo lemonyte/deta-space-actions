@@ -138,7 +138,11 @@ class ActionsMiddleware:
                         payload = json.loads(message["body"])
                     except json.JSONDecodeError:
                         payload = {}
-                    await self.send_json(send, await action.run(payload))
+                    output = await action.run(payload)
+                    try:
+                        await self.send_json(send, output)
+                    except TypeError:
+                        await self.send_plain_text(send, str(output))
                     return
         await self.app(scope, receive, send)
 
