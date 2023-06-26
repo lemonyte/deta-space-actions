@@ -29,16 +29,17 @@ class Action:
 
     def __init__(
         self,
-        name: str,
         handler: ActionHandler,
+        *,
         base_path: str,
-        inputs: Sequence[Input] = tuple(),
+        name: str = "",
         title: str = "",
+        inputs: Sequence[Input] = tuple(),
     ):
-        self.name = name
         self.handler = handler
-        self.inputs = inputs
+        self.name = name or handler.__name__
         self.title = title
+        self.inputs = inputs
         self.path = f"{base_path}/{self.name}"
 
     def run(self, payload: HandlerInput):
@@ -54,17 +55,43 @@ class Actions:
         self.base_path = base_path
         self._actions: MutableMapping[str, Action] = {}
 
-    def add(self, name: str, handler: ActionHandler, inputs: Sequence[Input] = tuple(), title: str = "") -> Action:
+    def add(
+        self,
+        handler: ActionHandler,
+        *,
+        name: str = "",
+        title: str = "",
+        inputs: Sequence[Input] = tuple(),
+    ) -> Action:
         """Add an action."""
+        name = name or handler.__name__
         if name in self._actions:
             raise ValueError(f"action '{name}' already exists")
-        action = Action(name, handler, self.base_path, inputs, title)
+        action = Action(
+            handler=handler,
+            base_path=self.base_path,
+            name=name,
+            title=title,
+            inputs=inputs,
+        )
         self._actions[action.name] = action
         return action
 
     def get(self, name: str) -> Optional[Action]:
         """Get an action by name."""
         return self._actions.get(name)
+
+    def action(self, *, name: str = "", title: str = "", inputs: Sequence[Input] = tuple()):
+        """Decorator to add an action."""
+        def decorator(handler: ActionHandler):
+            return self.add(
+                handler=handler,
+                name=name,
+                title=title,
+                inputs=inputs,
+            )
+
+        return decorator
 
     def declaration(self):
         """Return a JSON-serializable declaration of the actions and their inputs."""
