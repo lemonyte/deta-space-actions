@@ -49,6 +49,10 @@ class Actions:
         self._actions[action.name] = action
         return action
 
+    def get(self, name: str) -> Optional[Action]:
+        """Get an action by name."""
+        return self._actions.get(name)
+
     def declaration(self):
         """Return a JSON-serializable declaration of the actions and their inputs."""
         return {
