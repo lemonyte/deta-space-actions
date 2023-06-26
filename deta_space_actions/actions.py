@@ -4,9 +4,11 @@ from typing import (
     Any,
     Awaitable,
     Callable,
+    Iterable,
     MutableMapping,
     Optional,
     Sequence,
+    Tuple,
 )
 
 from .input import Input
@@ -140,42 +142,49 @@ class ActionsMiddleware:
                     return
         await self.app(scope, receive, send)
 
-    async def send_plain_text(self, send: "ASGISendCallable", content: str, status: int = 200):
+    async def send(
+        self,
+        send: "ASGISendCallable",
+        body: bytes,
+        *,
+        status: int = 200,
+        headers: Iterable[Tuple[bytes, bytes]] = (),
+    ):
         await send(
             {
                 "type": "http.response.start",
                 "status": status,
-                "headers": [(b"Content-Type", b"text/plain; charset=utf-8")],
+                "headers": headers,
                 "trailers": False,
             }
         )
         await send(
             {
                 "type": "http.response.body",
-                "body": content.encode("utf-8"),
+                "body": body,
                 "more_body": False,
             }
         )
 
-    async def send_json(self, send: "ASGISendCallable", content: Any, status: int = 200):
-        await send(
-            {
-                "type": "http.response.start",
-                "status": status,
-                "headers": [(b"Content-Type", b"application/json")],
-                "trailers": False,
-            }
+    async def send_plain_text(self, send: "ASGISendCallable", content: str, *, status: int = 200):
+        await self.send(
+            send=send,
+            body=content.encode("utf-8"),
+            status=status,
+            headers=[(b"Content-Type", b"text/plain; charset=utf-8")],
         )
-        await send(
-            {
-                "type": "http.response.body",
-                "body": json.dumps(
-                    content,
-                    ensure_ascii=False,
-                    allow_nan=False,
-                    indent=None,
-                    separators=(",", ":"),
-                ).encode("utf-8"),
-                "more_body": False,
-            }
+
+    async def send_json(self, send: "ASGISendCallable", content: Any, *, status: int = 200):
+        body = json.dumps(
+            content,
+            ensure_ascii=False,
+            allow_nan=False,
+            indent=None,
+            separators=(",", ":"),
+        ).encode("utf-8")
+        await self.send(
+            send=send,
+            body=body,
+            status=status,
+            headers=[(b"Content-Type", b"application/json; charset=utf-8")],
         )
