@@ -45,6 +45,7 @@ class Action:
         self.path = f"{base_path}/{self.name}"
 
     def run(self, payload: HandlerInput):
+        """Run the action with the provided payload."""
         return self.handler(payload)
 
 
@@ -85,6 +86,7 @@ class Actions:
 
     def action(self, *, name: str = "", title: str = "", inputs: Sequence[Input] = tuple()):
         """Decorator to add an action."""
+
         def decorator(handler: ActionHandler):
             return self.add(
                 handler=handler,
