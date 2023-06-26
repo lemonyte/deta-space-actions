@@ -105,7 +105,10 @@ class ActionsMiddleware:
                     return
                 message = await receive()
                 if message["type"] == "http.request":
-                    payload = json.loads(message["body"])
+                    try:
+                        payload = json.loads(message["body"])
+                    except json.JSONDecodeError:
+                        payload = {}
                     await self.send_json(send, await action.run(payload))
                     return
         await self.app(scope, receive, send)
