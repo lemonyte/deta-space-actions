@@ -19,7 +19,7 @@ This package is somewhat temporary, hopefully its functionality will be implemen
 
 - [ ] Finish writing it
   - [ ] Invocation function
-- [ ] Write a README
+- [ ] Add tests
 
 ## Installation
 
@@ -59,7 +59,7 @@ from deta_space_actions import Actions, ActionsMiddleware, Input, InputType
 
 # Define an action handler.
 async def hello(payload):
-    return f"Hello, {payload['name']}!"
+    return f"Hello, {payload.get('name', 'world')}!"
 
 
 # Create an Actions instance.
