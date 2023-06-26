@@ -22,7 +22,6 @@ if TYPE_CHECKING:
 # TODO: MutableMapping is incompatible with Dict??
 HandlerInput = MutableMapping[str, Any]
 ActionHandler = Callable[[HandlerInput], Awaitable[Any]]
-MISSING = Any
 
 
 class Action:
@@ -33,7 +32,7 @@ class Action:
         name: str,
         handler: ActionHandler,
         base_path: str,
-        inputs: Sequence[Input] = MISSING,
+        inputs: Sequence[Input] = tuple(),
         title: str = "",
     ):
         self.name = name
@@ -55,7 +54,7 @@ class Actions:
         self.base_path = base_path
         self._actions: MutableMapping[str, Action] = {}
 
-    def add(self, name: str, handler: ActionHandler, inputs: Sequence[Input] = MISSING, title: str = "") -> Action:
+    def add(self, name: str, handler: ActionHandler, inputs: Sequence[Input] = tuple(), title: str = "") -> Action:
         """Add an action."""
         if name in self._actions:
             raise ValueError(f"action '{name}' already exists")
