@@ -157,7 +157,7 @@ class ActionsMiddleware:
                         payload = json.loads(message["body"], cls=self.decoder)
                     except json.JSONDecodeError:
                         payload = {}
-                    output = await action(payload)
+                    output = (await action(payload)).as_serializable()
                     try:
                         await self.send_json(send, output)
                     except TypeError:
