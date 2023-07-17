@@ -45,7 +45,7 @@ class Action:
         self.inputs = inputs
         self.path = f"{base_path}/{self.name}"
 
-    def run(self, payload: HandlerInput):
+    def __call__(self, payload: HandlerInput):
         """Run the action with the provided payload."""
         return self.handler(payload)
 
@@ -98,7 +98,7 @@ class Actions:
 
         return decorator
 
-    def declaration(self):
+    def as_serializable(self):
         """Return a JSON-serializable declaration of the actions and their inputs."""
         return {
             "actions": [
@@ -106,7 +106,7 @@ class Actions:
                     "name": action.name,
                     "title": action.title,
                     "path": action.path,
-                    "input": [input.to_dict() for input in action.inputs],
+                    "input": [input.as_serializable() for input in action.inputs],
                 }
                 for action in self._actions.values()
             ],
@@ -142,7 +142,7 @@ class ActionsMiddleware:
                         payload = json.loads(message["body"], cls=self.decoder)
                     except json.JSONDecodeError:
                         payload = {}
-                    output = await action.run(payload)
+                    output = await action(payload)
                     try:
                         await self.send_json(send, output)
                     except TypeError:
