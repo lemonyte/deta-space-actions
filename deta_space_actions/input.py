@@ -15,7 +15,7 @@ class Input:
         self.type = type
         self.optional = optional
 
-    def to_dict(self):
+    def as_serializable(self):
         """Return a JSON-serializable representation of the input parameter."""
         return {
             "name": self.name,
