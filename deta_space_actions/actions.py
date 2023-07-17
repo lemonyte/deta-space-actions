@@ -131,7 +131,7 @@ class ActionsMiddleware:
                 if scope["method"] != "POST":
                     await self.send_plain_text(send, "Method Not Allowed", status=405)
                     return
-                name = scope["path"][len(self.actions.base_path):].rstrip("/")
+                name = scope["path"][len(self.actions.base_path):].strip("/")
                 action = self.actions.get(name)
                 if not action:
                     await self.send_plain_text(send, "Not Found", status=404)
