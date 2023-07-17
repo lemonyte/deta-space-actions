@@ -9,9 +9,11 @@ from typing import (
     Optional,
     Sequence,
     Tuple,
+    Type,
 )
 
 from .input import Input
+from .view import RawView, View
 
 if TYPE_CHECKING:
     from asgiref.typing import (
@@ -23,7 +25,7 @@ if TYPE_CHECKING:
 
 # TODO: MutableMapping is incompatible with Dict??
 HandlerInput = MutableMapping[str, Any]
-ActionHandler = Callable[[HandlerInput], Awaitable[Any]]
+ActionHandler = Callable[[HandlerInput], Awaitable[View]]
 
 
 class Action:
@@ -37,11 +39,13 @@ class Action:
         name: str = "",
         title: str = "",
         inputs: Sequence[Input] = tuple(),
+        view: Type[View] = RawView,
     ):
         self.handler = handler
         self.name = name or handler.__name__
         self.title = title
         self.inputs = inputs
+        self.view = view
         self.path = f"{base_path}/{self.name}"
 
     def run(self, payload: HandlerInput):
@@ -65,6 +69,7 @@ class Actions:
         name: str = "",
         title: str = "",
         inputs: Sequence[Input] = tuple(),
+        view: Type[View] = RawView,
     ) -> Action:
         """Add an action."""
         name = name or handler.__name__
@@ -76,6 +81,8 @@ class Actions:
             name=name,
             title=title,
             inputs=inputs,
+            # TODO: get view type from handler return type hint.
+            view=view,
         )
         self._actions[action.name] = action
         return action
@@ -84,7 +91,14 @@ class Actions:
         """Get an action by name."""
         return self._actions.get(name)
 
-    def action(self, *, name: str = "", title: str = "", inputs: Sequence[Input] = tuple()):
+    def action(
+        self,
+        *,
+        name: str = "",
+        title: str = "",
+        inputs: Sequence[Input] = tuple(),
+        view: Type[View] = RawView,
+    ):
         """Decorator to add an action."""
 
         def decorator(handler: ActionHandler):
@@ -93,6 +107,7 @@ class Actions:
                 name=name,
                 title=title,
                 inputs=inputs,
+                view=view,
             )
 
         return decorator
@@ -106,6 +121,7 @@ class Actions:
                     "title": action.title,
                     "path": action.path,
                     "input": [input.to_dict() for input in action.inputs],
+                    "output": action.view.id,
                 }
                 for action in self._actions.values()
             ],
