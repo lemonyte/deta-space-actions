@@ -13,7 +13,7 @@ from typing import (
 )
 
 from .input import Input
-from .view import RawView, View
+from .views import RawView, View
 
 if TYPE_CHECKING:
     from asgiref.typing import (
