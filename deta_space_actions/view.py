@@ -2,21 +2,7 @@ from abc import ABCMeta, abstractmethod
 from typing import Any, ClassVar, Optional, Sequence, Tuple, Union
 
 
-class BaseView(metaclass=ABCMeta):
-    id: ClassVar[str]
-    # ref: Optional[str] = None
-
-    # @staticmethod
-    # @abstractmethod
-    # def id() -> str:
-    #     ...
-
-    @abstractmethod
-    def as_serializable(self) -> Any:
-        ...
-
-
-class RawView(BaseView):
+class RawView:
     id = "@deta/raw"
 
     def __init__(self, data: Any):
@@ -26,7 +12,7 @@ class RawView(BaseView):
         return self.data
 
 
-class DetailView(BaseView):
+class DetailView:
     id = "@deta/detail"
 
     def __init__(
@@ -50,7 +36,7 @@ class DetailView(BaseView):
         }
 
 
-class FileView(BaseView):
+class FileView:
     id = "@deta/file"
 
     def __init__(self, url: str, type: str, name: Optional[str] = None):
@@ -86,7 +72,7 @@ class ListItem:
             "url": self.url,
             "view": {
                 "type": self.view.id,
-                "data": self.view.as_serializable() if isinstance(self.view, BaseView) else self.view,
+                "data": self.view.as_serializable(),
             }
             if self.view
             else None,
