@@ -3,6 +3,7 @@ from typing import Any, ClassVar, Optional, Sequence, Tuple, Union
 
 
 class RawView:
+    __slots__ = ("data",)
     id = "@deta/raw"
 
     def __init__(self, data: Any):
@@ -13,6 +14,7 @@ class RawView:
 
 
 class DetailView:
+    __slots__ = ("text", "title", "image_url", "url")
     id = "@deta/detail"
 
     def __init__(
@@ -37,6 +39,7 @@ class DetailView:
 
 
 class FileView:
+    __slots__ = ("url", "type", "name")
     id = "@deta/file"
 
     def __init__(self, url: str, type: str, name: Optional[str] = None):
@@ -53,6 +56,8 @@ class FileView:
 
 
 class ListItem:
+    __slots__ = ("title", "description", "url", "view")
+
     def __init__(
         self,
         title: str,
@@ -80,6 +85,7 @@ class ListItem:
 
 
 class ListView:
+    __slots__ = ("items", "title", "description")
     id = "@deta/list"
 
     def __init__(self, items: Sequence[ListItem], title: Optional[str] = None, description: Optional[str] = None):
