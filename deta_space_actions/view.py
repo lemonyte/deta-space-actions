@@ -1,5 +1,4 @@
-from abc import ABCMeta, abstractmethod
-from typing import Any, ClassVar, Optional, Sequence, Tuple, Union
+from typing import Any, ClassVar, Optional, Protocol, Sequence, Union
 
 
 class RawView:
@@ -101,15 +100,28 @@ class ListView:
         }
 
 
-class CustomView(BaseView):
-    id = 'x'
+class CustomViewProto(Protocol):
+    __slots__ = ("data",)
+    id: ClassVar[str]
 
-    def __init__(self, data: Any, id: str):
-        self.data = data
-        self.id = id
+    def __init__(self, data: Any):
+        ...
 
-    def as_serializable(self):
-        return self.data
+    def as_serializable(self) -> Any:
+        ...
 
 
-View = Union[RawView, DetailView, FileView, ListView, CustomView]
+View = Union[RawView, DetailView, FileView, ListView, CustomViewProto]
+
+
+def custom_view(id_: str):
+    class CustomView(CustomViewProto):
+        id = id_
+
+        def __init__(self, data: Any):
+            self.data = data
+
+        def as_serializable(self):
+            return self.data
+
+    return CustomView
