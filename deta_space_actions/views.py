@@ -115,6 +115,14 @@ View = Union[RawView, DetailView, FileView, ListView, CustomViewProto]
 
 
 def custom_view(id_: str):
+    """Class factory for creating custom views.
+
+    Example usage:
+        >>> MyView = custom_view("/card.html")
+        >>> @actions.action(view=MyView)
+        >>> async def my_action(payload) -> MyView:
+        >>>     return MyView(...)
+        """
     class CustomView(CustomViewProto):
         id = id_
 
