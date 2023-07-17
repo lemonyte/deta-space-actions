@@ -120,7 +120,8 @@ class Actions:
                     "name": action.name,
                     "title": action.title,
                     "path": action.path,
-                    "input": [input.to_dict() for input in action.inputs],
+                    "input": [input.as_serializable() for input in action.inputs],
+                    "output": action.view.id,
                 }
                 for action in self._actions.values()
             ],
