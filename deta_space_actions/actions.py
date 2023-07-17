@@ -9,6 +9,7 @@ from typing import (
     Optional,
     Sequence,
     Tuple,
+    Type,
 )
 
 from .input import Input
@@ -113,9 +114,10 @@ class Actions:
 
 
 class ActionsMiddleware:
-    def __init__(self, app: "ASGI3Application", actions: Actions):
+    def __init__(self, app: "ASGI3Application", actions: Actions, decoder: Optional[Type[json.JSONDecoder]] = None):
         self.app = app
         self.actions = actions
+        self.decoder = decoder
 
     async def __call__(self, scope: "Scope", receive: "ASGIReceiveCallable", send: "ASGISendCallable"):
         if scope["type"] == "http":
@@ -123,7 +125,7 @@ class ActionsMiddleware:
                 if scope["method"] != "GET":
                     await self.send_plain_text(send, "Method Not Allowed", status=405)
                     return
-                await self.send_json(send, self.actions.declaration())
+                await self.send_json(send, self.actions.as_serializable())
                 return
             if scope["path"].startswith(self.actions.base_path):
                 if scope["method"] != "POST":
@@ -137,7 +139,7 @@ class ActionsMiddleware:
                 message = await receive()
                 if message["type"] == "http.request":
                     try:
-                        payload = json.loads(message["body"])
+                        payload = json.loads(message["body"], cls=self.decoder)
                     except json.JSONDecodeError:
                         payload = {}
                     output = await action.run(payload)
@@ -180,11 +182,19 @@ class ActionsMiddleware:
             headers=[(b"Content-Type", b"text/plain; charset=utf-8")],
         )
 
-    async def send_json(self, send: "ASGISendCallable", content: Any, *, status: int = 200):
+    async def send_json(
+        self,
+        send: "ASGISendCallable",
+        content: Any,
+        *,
+        status: int = 200,
+        encoder: Optional[Type[json.JSONEncoder]] = None,
+    ):
         body = json.dumps(
             content,
             ensure_ascii=False,
             allow_nan=False,
+            cls=encoder,
             indent=None,
             separators=(",", ":"),
         ).encode("utf-8")
