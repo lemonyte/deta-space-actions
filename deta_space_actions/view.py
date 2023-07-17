@@ -93,11 +93,13 @@ class ListItem:
         }
 
 
-class ListView(BaseView):
-    items: Union[Sequence[ListItem], Tuple[ListItem, ...]]
-    title: Optional[str] = None
-    description: Optional[str] = None
-    id: ClassVar[str] = "@deta/list"
+class ListView:
+    id = "@deta/list"
+
+    def __init__(self, items: Sequence[ListItem], title: Optional[str] = None, description: Optional[str] = None):
+        self.items = items
+        self.title = title
+        self.description = description
 
     def as_serializable(self):
         return {
