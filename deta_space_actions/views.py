@@ -77,7 +77,7 @@ class ListItem:
         self.url = url
         self.view = view
 
-    def to_dict(self):
+    def as_serializable(self):
         return {
             "title": self.title,
             "description": self.description,
@@ -110,7 +110,7 @@ class ListView:
         return {
             "title": self.title,
             "description": self.description,
-            "items": [item.to_dict() for item in self.items],
+            "items": [item.as_serializable() for item in self.items],
         }
 
 
