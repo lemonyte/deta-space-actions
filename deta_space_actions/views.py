@@ -1,7 +1,20 @@
-from typing import Any, ClassVar, Optional, Protocol, Sequence, Union
+from abc import ABC, abstractmethod
+from typing import Any, ClassVar, Optional, Sequence
 
 
-class RawView:
+class View(ABC):
+    id: ClassVar[str]
+
+    @abstractmethod
+    def __init__(self, data: Any):
+        ...
+
+    @abstractmethod
+    def as_serializable(self) -> Any:
+        ...
+
+
+class RawView(View):
     __slots__ = ("data",)
     id = "@deta/raw"
 
@@ -12,7 +25,7 @@ class RawView:
         return self.data
 
 
-class DetailView:
+class DetailView(View):
     __slots__ = ("text", "title", "image_url", "url")
     id = "@deta/detail"
 
@@ -38,7 +51,7 @@ class DetailView:
         }
 
 
-class FileView:
+class FileView(View):
     __slots__ = ("url", "type", "name")
     id = "@deta/file"
 
@@ -91,7 +104,7 @@ class ListItem:
         }
 
 
-class ListView:
+class ListView(View):
     __slots__ = ("items", "title", "description")
     id = "@deta/list"
 
@@ -114,20 +127,6 @@ class ListView:
         }
 
 
-class CustomViewProto(Protocol):
-    __slots__ = ("data",)
-    id: ClassVar[str]
-
-    def __init__(self, data: Any):
-        ...
-
-    def as_serializable(self) -> Any:
-        ...
-
-
-View = Union[RawView, DetailView, FileView, ListView, CustomViewProto]
-
-
 # TODO: any custom view class is compatible with any other custom view class in typing.
 # This is not ideal, but not critical.
 def custom_view(id_: str):
@@ -140,7 +139,8 @@ def custom_view(id_: str):
         >>>     return MyView(...)
     """
 
-    class CustomView(CustomViewProto):
+    class CustomView(View):
+        __slots__ = ("data",)
         id = id_
 
         def __init__(self, data: Any):
