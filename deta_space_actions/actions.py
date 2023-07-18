@@ -41,6 +41,8 @@ class Action:
         inputs: Sequence[Input] = tuple(),
         view: Type[View] = RawView,
     ):
+        if view == View:
+            raise TypeError("action handler return type cannot be base View class")
         self.handler = handler
         self.name = name or handler.__name__
         self.title = title
@@ -69,7 +71,6 @@ class Actions:
         name: str = "",
         title: str = "",
         inputs: Sequence[Input] = tuple(),
-        view: Type[View] = RawView,
     ) -> Action:
         """Add an action."""
         name = name or handler.__name__
@@ -81,8 +82,7 @@ class Actions:
             name=name,
             title=title,
             inputs=inputs,
-            # TODO: get view type from handler return type hint.
-            view=view,
+            view=handler.__annotations__.get("return", RawView),
         )
         self._actions[action.name] = action
         return action
@@ -97,7 +97,6 @@ class Actions:
         name: str = "",
         title: str = "",
         inputs: Sequence[Input] = tuple(),
-        view: Type[View] = RawView,
     ):
         """Decorator to add an action."""
 
@@ -107,7 +106,6 @@ class Actions:
                 name=name,
                 title=title,
                 inputs=inputs,
-                view=view,
             )
 
         return decorator
@@ -146,7 +144,7 @@ class ActionsMiddleware:
                 if scope["method"] != "POST":
                     await self.send_plain_text(send, "Method Not Allowed", status=405)
                     return
-                name = scope["path"][len(self.actions.base_path):].strip("/")
+                name = scope["path"][len(self.actions.base_path):].strip("/")  # fmt: skip
                 action = self.actions.get(name)
                 if not action:
                     await self.send_plain_text(send, "Not Found", status=404)
