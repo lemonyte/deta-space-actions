@@ -6,10 +6,6 @@ class View(ABC):
     id: ClassVar[str]
 
     @abstractmethod
-    def __init__(self, data: Any):
-        ...
-
-    @abstractmethod
     def as_serializable(self) -> Any:
         ...
 
@@ -26,7 +22,7 @@ class RawView(View):
 
 
 class DetailView(View):
-    __slots__ = ("text", "title", "image_url", "url")
+    __slots__ = ("text", "title", "url", "image_url")
     id = "@deta/detail"
 
     def __init__(
