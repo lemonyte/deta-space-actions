@@ -79,7 +79,7 @@ class ListItem:
         *,
         description: Optional[str] = None,
         url: Optional[str] = None,
-        view: Optional["View"] = None,
+        view: Optional[View] = None,
     ):
         self.title = title
         self.description = description
