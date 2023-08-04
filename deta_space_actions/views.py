@@ -123,14 +123,14 @@ class ListView(View):
         }
 
 
-# TODO: any custom view class is compatible with any other custom view class in typing.
+# FIXME: any custom view class is compatible with any other custom view class in typing.
 # This is not ideal, but not critical.
 def custom_view(id_: str):
     """Class factory for creating custom views.
 
     Example usage:
         >>> MyView = custom_view("/card.html")
-        >>> @actions.action(view=MyView)
+        >>> @actions.action()
         >>> async def my_action(payload) -> MyView:
         >>>     return MyView(...)
     """
