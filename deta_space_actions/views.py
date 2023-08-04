@@ -125,7 +125,7 @@ class ListView(View):
 
 # FIXME: any custom view class is compatible with any other custom view class in typing.
 # This is not ideal, but not critical.
-def custom_view(id_: str):
+def custom_view(id_: str, /):
     """Class factory for creating custom views.
 
     Example usage:
