@@ -13,6 +13,7 @@ from typing import (
 )
 
 from .input import Input
+from .views import RawView, View
 
 if TYPE_CHECKING:
     from asgiref.typing import (
@@ -24,7 +25,7 @@ if TYPE_CHECKING:
 
 # TODO: MutableMapping is incompatible with Dict??
 HandlerInput = MutableMapping[str, Any]
-ActionHandler = Callable[[HandlerInput], Awaitable[Any]]
+ActionHandler = Callable[[HandlerInput], Awaitable[View]]
 
 
 class Action:
@@ -38,11 +39,15 @@ class Action:
         name: str = "",
         title: str = "",
         inputs: Sequence[Input] = tuple(),
+        view: Type[View] = RawView,
     ):
+        if view == View:
+            raise TypeError("action handler return type cannot be base View class")
         self.handler = handler
         self.name = name or handler.__name__
         self.title = title
         self.inputs = inputs
+        self.view = view
         self.path = f"{base_path}/{self.name}"
 
     def __call__(self, payload: HandlerInput):
@@ -77,6 +82,7 @@ class Actions:
             name=name,
             title=title,
             inputs=inputs,
+            view=handler.__annotations__.get("return", RawView),
         )
         self._actions[action.name] = action
         return action
@@ -85,7 +91,13 @@ class Actions:
         """Get an action by name."""
         return self._actions.get(name)
 
-    def action(self, *, name: str = "", title: str = "", inputs: Sequence[Input] = tuple()):
+    def action(
+        self,
+        *,
+        name: str = "",
+        title: str = "",
+        inputs: Sequence[Input] = tuple(),
+    ):
         """Decorator to add an action."""
 
         def decorator(handler: ActionHandler):
@@ -107,6 +119,7 @@ class Actions:
                     "title": action.title,
                     "path": action.path,
                     "input": [input.as_serializable() for input in action.inputs],
+                    "output": action.view.id,
                 }
                 for action in self._actions.values()
             ],
@@ -131,7 +144,7 @@ class ActionsMiddleware:
                 if scope["method"] != "POST":
                     await self.send_plain_text(send, "Method Not Allowed", status=405)
                     return
-                name = scope["path"][len(self.actions.base_path):].strip("/")
+                name = scope["path"][len(self.actions.base_path):].strip("/")  # fmt: skip
                 action = self.actions.get(name)
                 if not action:
                     await self.send_plain_text(send, "Not Found", status=404)
@@ -142,7 +155,7 @@ class ActionsMiddleware:
                         payload = json.loads(message["body"], cls=self.decoder)
                     except json.JSONDecodeError:
                         payload = {}
-                    output = await action(payload)
+                    output = (await action(payload)).as_serializable()
                     try:
                         await self.send_json(send, output)
                     except TypeError:
