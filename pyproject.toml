@@ -32,7 +32,7 @@ classifiers = [
 Repository = "https://github.com/lemonyte/deta-space-actions"
 
 [project.optional-dependencies]
-typing = ["asgiref~=3.7.2"]
+typing = ["asgiref~=3.8.1"]
 
 [tool.setuptools]
 packages = ["deta_space_actions"]
