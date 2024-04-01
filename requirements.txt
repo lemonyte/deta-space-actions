@@ -1,4 +1,4 @@
 # Build frontend.
-build~=1.1.1
+build~=1.2.1
 # Type hints for the ASGI middleware.
 asgiref~=3.8.1
