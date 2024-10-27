@@ -1,5 +1,8 @@
 # Deta Space Actions
 
+> [!IMPORTANT]  
+> This project was created for Deta Space, a service which no longer exists as of October 17th, 2024.
+
 Python package to interact with Deta Space Actions.
 
 Ported from the Node package [deta-space-actions](https://www.npmjs.com/package/deta-space-actions).
